@@ -1,0 +1,28 @@
+USE jspweb
+GO
+
+/****** Object:  Table [dbo].[Employees]    Script Date: 19/08/2016 12:21:30 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[Employees](
+	[ID] [varchar](9) NOT NULL,
+	[firstName] [varchar](250) NOT NULL,
+	[lastName] [varchar](250) NOT NULL,
+	[dob] [date] NULL,
+ CONSTRAINT [uc_EmployeeID] UNIQUE NONCLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
