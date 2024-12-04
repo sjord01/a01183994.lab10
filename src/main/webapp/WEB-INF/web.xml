@@ -8,7 +8,20 @@
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
   <display-name>Archetype Created Web Application</display-name>
   
-  <welcome-file-list>
-    <welcome-file>a01183994.lab10.servlet.EmployeeServlet</welcome-file>
-  </welcome-file-list>
+	<context-param>
+	    <param-name>db.url</param-name>
+	    <param-value>jdbc:sqlserver://java-sql.ad.bcit.ca:1433;databaseName=jspweb;encrypt=false</param-value>
+	</context-param>
+	<context-param>
+	    <param-name>db.username</param-name>
+	    <param-value>javastudent</param-value>
+	</context-param>
+	<context-param>
+	    <param-name>db.password</param-name>
+	    <param-value>compjava</param-value>
+	</context-param>
+  
+	 <welcome-file-list>
+	   <welcome-file>a01183994.lab10.servlet.EmployeeServlet</welcome-file>
+	 </welcome-file-list>
 </web-app>

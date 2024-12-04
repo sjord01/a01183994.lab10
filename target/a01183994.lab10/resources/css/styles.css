@@ -17,6 +17,11 @@
     width: 1px !important;
 }
 
+body {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
 /* HEADER */
 header {
     width: 100%;
@@ -164,24 +169,41 @@ li {
     background-position: left 0.5rem top 0.5rem;
 }
 
+/* For mobile devices (default behavior without media query) */
 table {
-    width: 100%;
+    border: 1px solid var(--grey-01);
     border-collapse: collapse;
-    margin-bottom: 2rem;
-    font-family: var(--secondary-font-regular);
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    table-layout: fixed;
+ }
+  
+table caption {
+	font-family: var(--main-font-bold);
+    font-size: 1.5rem;
+    margin: .5em 0 .75em;
 }
-
-th, td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--grey-01);
+  
+table tr {
+	font-family: var(--secondary-font-regular);
+    background-color:var(--grey-01);
+    border: 1px solid var(--grey-02);
+    padding: .35em;
 }
-
-th {
+  
+table th,
+table td {
+    padding: .625em;
+    text-align: center;
+}
+  
+table th {
     background-color: var(--light-blue-02);
-    font-family: var(--heading-font-bold);
+    font-family: var(--main-font-medium);
     font-size: 1.15rem;
     letter-spacing: 0.1em;
+    text-transform: uppercase;
 }
 
 tr:nth-child(even) {
@@ -189,41 +211,60 @@ tr:nth-child(even) {
 }
 
 tr:hover {
-    background-color: var(--grey-01);
+    background-color: var(--orange-01);
+    filter: brightness(150%);
 }
 
-@media (max-width: 767px) {
-    table, thead, tbody, th, td, tr {
-        display: block;
+  
+@media screen and (max-width: 600px) {
+    table {
+      border: 0;
+    }
+  
+    table caption {
+      font-size: 1.3em;
     }
     
-    thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
+    table thead {
+      border: none;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
     }
     
-    tr {
-        margin-bottom: 1rem;
-        border: 1px solid var(--grey-01);
+    table tr {
+      border-bottom: 3px solid #ddd;
+      display: block;
+      margin-bottom: .625em;
     }
     
-    td {
-        border: none;
-        position: relative;
-        padding-left: 50%;
+    table td {
+      border-bottom: 1px solid #ddd;
+      display: block;
+      font-size: .8em;
+      text-align: right;
     }
     
-    td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 6px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        font-weight: bold;
+    table td::before {
+      /*
+      * aria-label has no advantage, it won't be read inside a table
+      content: attr(aria-label);
+      */
+      content: attr(data-label);
+      float: left;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    table td:last-child {
+      border-bottom: 0;
     }
 }
+
 
 @media (min-width: 767px) { 
     /* BUTTONS */

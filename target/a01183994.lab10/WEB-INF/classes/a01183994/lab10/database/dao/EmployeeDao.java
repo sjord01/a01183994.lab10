@@ -14,159 +14,83 @@ import a01183994.lab10.database.DbConstants;
 import a01183994.lab10.database.util.ApplicationException;
 import a01183994.lab10.database.util.DbUtil;
 
-public class EmployeeDao implements Dao<Employee> {
-	public static final String TABLE_NAME;
-    private final Database database;
+public class EmployeeDao extends Dao<Employee> {
 
-    static
-    {
-        TABLE_NAME = DbConstants.EMPLOYEES_TABLE_NAME;
-    }
-    
-    public EmployeeDao(final Database database)
-    {
-        this.database = database;
+    public EmployeeDao(final Database database) {
+        super(database, DbConstants.EMPLOYEES_TABLE_NAME);
     }
 
-	
-	 public List<Employee> getAll() throws SQLException, ApplicationException
-	    {
-	        ArrayList<Employee> employees;
-	        ResultSet           resultSet;
+    @Override
+    public List<Employee> getAll() throws SQLException, ApplicationException {
+        List<Employee> employees = new ArrayList<>();
+        String query = String.format("SELECT * FROM %s", tableName);
+        
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            
+            employees = getEmployeesFromResultSet(resultSet);
+        } catch (SQLException e) {
+            throw e;
+        }
 
-	        try(Connection connection = database.getConnection();
-	            Statement statement = connection.createStatement())
-	        {
-	            String query = String.format("SELECT * FROM %s",
-	                                         TABLE_NAME);
-	            resultSet = statement.executeQuery(query);
-	            employees = getEmployeesFromResultSet(resultSet);
-	        }
-	        catch(SQLException e)
-	        {
-	            System.out.println("error getting employees");
-	            throw e;
-	        }
+        return employees;
+    }
 
-	        return employees;
-	    }
-	
-	public void listAllTablesNames() throws SQLException
-    {
-        ResultSet resultSet;
-        try(Connection connection = database.getConnection();
-            Statement statement = connection.createStatement())
-        {
-            String query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
-            resultSet = statement.executeQuery(query);
-            while(resultSet.next())
-            {
-                String tableName = resultSet.getString("TABLE_NAME");
-                System.out.println("Table: " + tableName);
+    @Override
+    public void createTable() throws SQLException {
+        String createTableSQLQuery = DbUtil.readSQLFile(DbConstants.EMPLOYEE_CREATE_TABLE_SCRIPT_NAME);
+        createTableSQLQuery = createTableSQLQuery.replace("Employees", tableName);
+        executeSQLScript(createTableSQLQuery);
+    }
+
+    @Override
+    public void dropTable() throws SQLException {
+        dropTableIfExists();
+    }
+
+    @Override
+    public void insertAll() throws SQLException {
+        String insertAllSQLQuery = DbUtil.readSQLFile(DbConstants.EMPLOYEE_INSERT_ALL_SCRIPT_NAME);
+        insertAllSQLQuery = insertAllSQLQuery.replaceAll("Employees", tableName);
+        executeSQLScript(insertAllSQLQuery);
+    }
+
+    public void listAllTablesNames() throws SQLException {
+        String query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+        
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            
+            while (resultSet.next()) {
+                @SuppressWarnings("unused")
+				String tableName = resultSet.getString("TABLE_NAME");
             }
-        }
-        catch(Exception e)
-        {
-            System.out.println(e.getMessage());
-            throw new SQLException(e);
+        } catch (SQLException e) {
+            throw e;
         }
     }
 
-	    private ArrayList<Employee> getEmployeesFromResultSet(final ResultSet resultSet) throws SQLException, ApplicationException
-	    {
-	        final ArrayList<Employee> employees = new ArrayList<>();
+    private ArrayList<Employee> getEmployeesFromResultSet(final ResultSet resultSet) throws SQLException, ApplicationException {
+        final ArrayList<Employee> employees = new ArrayList<>();
 
-	        while(resultSet.next())
-	        {
-	            final Employee employee;
-	            final String   id        = resultSet.getString("ID");
-	            final String   firstName = resultSet.getString("firstName");
-	            final String   lastName  = resultSet.getString("lastName");
-	            final String   dobString = resultSet.getString("dob");
+        while (resultSet.next()) {
+            final String id = resultSet.getString("ID");
+            final String firstName = resultSet.getString("firstName");
+            final String lastName = resultSet.getString("lastName");
+            final String dobString = resultSet.getString("dob");
 
-	            if(dobString != null)
-	            {
-	                final LocalDate dob = LocalDate.parse(resultSet.getString("dob"));
-	                employee = new Employee(id, firstName, lastName, dob);
-	            }
-	            else
-	            {
-	                employee = new Employee(id, firstName, lastName);
-	            }
+            final Employee employee;
+            if (dobString != null) {
+                final LocalDate dob = LocalDate.parse(dobString);
+                employee = new Employee(id, firstName, lastName, dob);
+            } else {
+                employee = new Employee(id, firstName, lastName);
+            }
 
-	            employees.add(employee);
-	        }
-	        return employees;
-	    }
-	    
-	    public void dropTable() throws SQLException
-	    {
-	        try(Connection connection = database.getConnection();
-	            Statement statement = connection.createStatement())
-	        {
-	            String query = String.format("DROP TABLE %s", TABLE_NAME);
-	            statement.executeUpdate(query);
-	        }
-	        catch(Exception e)
-	        {
-	            System.out.println("error dropping table");
-	            throw e;
-	        }
-
-	        System.out.println("Table " + TABLE_NAME + "dropped correctly");
-	    }
-	    
-
-	    public void createTable() throws SQLException {
-	        System.out.println("Creating table");
-	        String ucIdentifier = "uc_" + DbConstants.TABLE_PREFIX + "EmployeeID";
-	        String createTableSQLQuery = DbUtil.readSQLFile(DbConstants.EMPLOYEE_CREATE_TABLE_SCRIPT_NAME);
-	        createTableSQLQuery = createTableSQLQuery.replace("Employees", TABLE_NAME);
-	        createTableSQLQuery = createTableSQLQuery.replace("uc_EmployeeID", ucIdentifier);
-	        executeSQLScript(createTableSQLQuery);
-	    }
-
-	    /**
-	     * Inserts all employee records into the database using a pre-defined SQL script.
-	     * The SQL script is read from the file specified by {@link DbConstants#EMPLOYEE_INSERT_ALL_SCRIPT_NAME}.
-	     *
-	     * @throws SQLException if a database access error occurs or the operation fails.
-	     */
-	    public void insertAll() throws SQLException
-	    {
-	        System.out.println("Inserting employees");
-	        String insertAllSQLQuery = DbUtil.readSQLFile(DbConstants.EMPLOYEE_INSERT_ALL_SCRIPT_NAME);
-	        insertAllSQLQuery = insertAllSQLQuery.replaceAll("Employees", TABLE_NAME);
-	        executeSQLScript(insertAllSQLQuery);
-	    }
-
-	    /**
-	     * Executes an SQL script containing multiple statements, separated by "GO".
-	     *
-	     * @param script the SQL script to execute.
-	     * @throws SQLException if a database access error occurs or the script execution fails.
-	     */
-	    private void executeSQLScript(final String script) throws SQLException
-	    {
-	        String[] sqlBatches = script.split("GO");
-
-	        try(Connection connection = database.getConnection();
-	            Statement statement = connection.createStatement())
-	        {
-	            for(String sql : sqlBatches)
-	            {
-	                sql = sql.trim();
-	                if(!sql.isEmpty())
-	                {
-	                    statement.execute(sql);
-	                }
-	            }
-	        }
-	        catch(Exception e)
-	        {
-	            System.out.println("Error performing SQL operation in the employees table: " + e.getMessage());
-	            throw new SQLException(e);
-	        }
-	    }
-
+            employees.add(employee);
+        }
+        return employees;
+    }
 }

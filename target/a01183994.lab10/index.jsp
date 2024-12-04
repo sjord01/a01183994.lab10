@@ -14,20 +14,33 @@
             <h1>COMP 3601</h1>
      </header>
      <main>
+     <section>
+     <h1>Employee Management System</h1>
+     <p>This web application allows users to perform CRUD (Create, Read, Update, Delete) 
+     operations on an employee database. Users can view a list of employees, add new employees, 
+     search for specific employees by ID, and remove employees from the database. The application 
+     follows a Model 2 design pattern with separate Controller, Presentation, Business, and Data layers, 
+     ensuring a well-structured and maintainable codebase. It utilizes JSP for the user interface and 
+     interacts with a SQL Server database to store and retrieve employee information.</p>
+     </section>
+     <section>
     <table>
+    	<caption>Employee List</caption>
+    	<thead>
         <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>DOB</th>
+            <th scope="col">ID</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">DOB</th>
         </tr>
+        </thead>
 <%--        <jsp:useBean id="employees" scope="request" type="java.util.List"/>--%>
         <c:forEach var="employee" items="${employees}">
             <tr>
-                <td><c:out value="${employee.id}"/> </td>
-                <td><c:out value="${employee.firstName}"/> </td>
-                <td><c:out value="${employee.lastName}"/> </td>
-                <td><c:out value="${employee.dateOfBirth}"/> </td>
+                <td data-label="ID"><c:out value="${employee.id}"/> </td>
+                <td data-label="First Name"><c:out value="${employee.firstName}"/> </td>
+                <td data-label="Last Name"><c:out value="${employee.lastName}"/> </td>
+                <td data-label="DOB"><c:out value="${employee.dateOfBirth}"/> </td>
             </tr>
         </c:forEach>
 
@@ -39,6 +52,7 @@
             <p><c:out value="${error}"/></p>
         </c:if>
     </table>
+    </section>
     </main>
 </body>
 </html>

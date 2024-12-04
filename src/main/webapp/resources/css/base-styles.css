@@ -46,6 +46,7 @@ body {
     --light-blue-02:    #C0EEF2;
     --blue-01:          #537FE7;
     --orange-01:        #D56B28;
+    --orange-01-50: hsl(from var(--orange-01) h s calc(l * 0.5));
 }
 
 @font-face {
