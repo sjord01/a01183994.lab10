@@ -210,10 +210,16 @@ tr:nth-child(even) {
     background-color: var(--white-primary);
 }
 
-tr:hover {
+thead tr:hover {
+    background-color: unset;
+    filter: unset;
+}
+
+tbody tr:hover {
     background-color: var(--orange-01);
     filter: brightness(150%);
 }
+
 
   
 @media screen and (max-width: 600px) {
@@ -256,7 +262,6 @@ tr:hover {
       */
       content: attr(data-label);
       float: left;
-      font-weight: bold;
       text-transform: uppercase;
     }
     

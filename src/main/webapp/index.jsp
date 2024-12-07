@@ -53,6 +53,9 @@
         </c:if>
     </table>
     </section>
+    <jsp:include page="addEmployees.jsp" />
+    <jsp:include page="findEmployees.jsp" />
+    <jsp:include page="deleteEmployee.jsp" />
     </main>
 </body>
 </html>

@@ -11,6 +11,8 @@ import a01183994.lab10.database.util.ApplicationException;
 public abstract class Dao<T> {
     protected final Database database;
     protected final String tableName;
+    
+    private static final String SQL_DELIMETER = "GO";
 
     protected Dao(Database database, String tableName) {
         this.database = database;
@@ -23,7 +25,7 @@ public abstract class Dao<T> {
     public abstract void insertAll() throws SQLException;
 
     protected void executeSQLScript(final String script) throws SQLException {
-        String[] sqlBatches = script.split("GO");
+        String[] sqlBatches = script.split(SQL_DELIMETER);
 
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement()) {

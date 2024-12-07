@@ -7,5 +7,6 @@
 /Users/sjordonez/eclipse-workspace/a01183994.lab10/src/main/java/a01183994/lab10/database/dao/EmployeeDao.java
 /Users/sjordonez/eclipse-workspace/a01183994.lab10/src/main/java/a01183994/lab10/database/util/ApplicationException.java
 /Users/sjordonez/eclipse-workspace/a01183994.lab10/src/main/java/a01183994/lab10/database/util/DbUtil.java
+/Users/sjordonez/eclipse-workspace/a01183994.lab10/src/main/java/a01183994/lab10/database/util/ErrorCode.java
 /Users/sjordonez/eclipse-workspace/a01183994.lab10/src/main/java/a01183994/lab10/database/util/Validator.java
 /Users/sjordonez/eclipse-workspace/a01183994.lab10/src/main/java/a01183994/lab10/servlet/EmployeeServlet.java

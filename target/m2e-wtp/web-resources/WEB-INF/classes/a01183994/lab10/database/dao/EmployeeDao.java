@@ -1,6 +1,7 @@
 package a01183994.lab10.database.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,6 +14,8 @@ import a01183994.lab10.database.Database;
 import a01183994.lab10.database.DbConstants;
 import a01183994.lab10.database.util.ApplicationException;
 import a01183994.lab10.database.util.DbUtil;
+import a01183994.lab10.database.util.ErrorCode;
+import a01183994.lab10.database.util.Validator;
 
 public class EmployeeDao extends Dao<Employee> {
 
@@ -69,6 +72,84 @@ public class EmployeeDao extends Dao<Employee> {
             }
         } catch (SQLException e) {
             throw e;
+        }
+    }
+    
+    public void insertEmployee(Employee employee) throws SQLException {
+        String sql = String.format("INSERT INTO %s (ID, firstName, lastName, dob) VALUES (?, ?, ?, ?)", tableName);
+        
+        try (Connection connection = database.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            
+            stmt.setString(1, employee.getId());
+            stmt.setString(2, employee.getFirstName());
+            stmt.setString(3, employee.getLastName());
+            stmt.setDate(4, java.sql.Date.valueOf(employee.getDateOfBirth()));
+            
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Error inserting employee into " + tableName, e);
+        }
+    }
+    
+    public ErrorCode validateEmployee(Employee employee) throws SQLException {
+        try {
+            // Check for null employee
+            if (employee == null) {
+                return ErrorCode.INVALID_DATA;
+            }
+
+            // Use Validator methods for all validations
+            Validator.validateId(employee.getId());
+            Validator.validateString(employee.getFirstName());
+            Validator.validateString(employee.getLastName());
+      
+            // Check for duplicate ID
+            String query = String.format("SELECT COUNT(*) FROM %s WHERE ID = ?", tableName);
+            try (Connection conn = database.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, employee.getId());
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    return ErrorCode.DUPLICATE_ID;
+                }
+            }
+
+            return ErrorCode.SUCCESS_ADD;
+
+        } catch (ApplicationException e) {
+            return ErrorCode.INVALID_DATA;
+        }
+    }
+    
+    public Employee findEmployeeById(String id) throws SQLException, ApplicationException {
+        String query = String.format("SELECT * FROM %s WHERE ID = ?", tableName);
+        
+        try (Connection connection = database.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setString(1, id.toUpperCase());
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                LocalDate dob = rs.getDate("dob").toLocalDate();
+                return new Employee(id.toUpperCase(), firstName, lastName, dob);
+            }
+            return null;
+        }
+    }
+    
+    public boolean deleteEmployee(String id) throws SQLException {
+        String sql = String.format("DELETE FROM %s WHERE ID = ?", tableName);
+        
+        try (Connection connection = database.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            
+            stmt.setString(1, id.toUpperCase());
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         }
     }
 
