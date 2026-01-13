@@ -7,6 +7,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,21 +21,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @WebServlet("/adminQuery")
 @ServletSecurity(@HttpConstraint(rolesAllowed = "admin"))
 public class AdminQueryServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    
+    // Pattern to validate SELECT queries more strictly
+    private static final Pattern SELECT_PATTERN = Pattern.compile(
+        "^SELECT\\s+.+\\s+FROM\\s+\\w+.*$",
+        Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+    );
+    
+    // Pattern to detect dangerous SQL keywords
+    private static final Pattern DANGEROUS_PATTERN = Pattern.compile(
+        ".*(;|--|/\\*|\\*/|xp_|sp_|exec|execute|insert|update|delete|drop|create|alter|grant|revoke).*",
+        Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+    );
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
-        // Check if user is in admin role using programmatic security
-        if (!request.isUserInRole("admin")) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied. Admin role required.");
-            return;
-        }
         
         String query = request.getParameter("query");
         
@@ -42,10 +52,17 @@ public class AdminQueryServlet extends HttpServlet {
             return;
         }
         
-        // Validate that it's a SELECT query
-        String trimmedQuery = query.trim().toUpperCase();
-        if (!trimmedQuery.startsWith("SELECT")) {
-            request.setAttribute("error", "Only SELECT queries are allowed");
+        // Validate that it's a safe SELECT query
+        String trimmedQuery = query.trim();
+        if (!SELECT_PATTERN.matcher(trimmedQuery).matches()) {
+            request.setAttribute("error", "Invalid SELECT query format");
+            request.getRequestDispatcher("/admin.jsp").forward(request, response);
+            return;
+        }
+        
+        // Check for dangerous SQL keywords
+        if (DANGEROUS_PATTERN.matcher(trimmedQuery).matches()) {
+            request.setAttribute("error", "Query contains forbidden SQL keywords");
             request.getRequestDispatcher("/admin.jsp").forward(request, response);
             return;
         }
@@ -60,9 +77,22 @@ public class AdminQueryServlet extends HttpServlet {
         ResultSet rs = null;
         
         try {
-            // Execute the query
-            conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            // Try to use DataSource if available, otherwise fall back to DriverManager
+            try {
+                Context initContext = new InitialContext();
+                Context envContext = (Context) initContext.lookup("java:comp/env");
+                DataSource ds = (DataSource) envContext.lookup("jdbc/jspweb");
+                conn = ds.getConnection();
+            } catch (Exception e) {
+                // Fallback to DriverManager for development
+                conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            }
+            
+            // Set read-only mode and timeout for safety
+            conn.setReadOnly(true);
             stmt = conn.createStatement();
+            stmt.setQueryTimeout(10); // 10 seconds timeout
+            
             rs = stmt.executeQuery(query);
             
             // Get metadata to extract column names
@@ -74,20 +104,28 @@ public class AdminQueryServlet extends HttpServlet {
                 columnNames.add(metaData.getColumnName(i));
             }
             
-            // Process results
+            // Process results with a limit to prevent memory issues
             List<Map<String, Object>> results = new ArrayList<>();
-            while (rs.next()) {
+            int rowCount = 0;
+            int maxRows = 1000; // Limit to 1000 rows
+            
+            while (rs.next() && rowCount < maxRows) {
                 Map<String, Object> row = new HashMap<>();
                 for (String columnName : columnNames) {
                     row.put(columnName, rs.getObject(columnName));
                 }
                 results.add(row);
+                rowCount++;
             }
             
             // Set attributes for JSP
             request.setAttribute("queryResults", results);
             request.setAttribute("columnNames", columnNames);
             request.setAttribute("queryExecuted", true);
+            
+            if (rowCount >= maxRows) {
+                request.setAttribute("error", "Results limited to " + maxRows + " rows");
+            }
             
         } catch (Exception e) {
             request.setAttribute("error", "Error executing query: " + e.getMessage());
