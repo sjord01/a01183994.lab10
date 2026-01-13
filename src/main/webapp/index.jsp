@@ -22,13 +22,16 @@
      follows a Model 2 design pattern with separate Controller, Presentation, Business, and Data layers, 
      ensuring a well-structured and maintainable codebase. It utilizes JSP for the user interface and 
      interacts with a SQL Server database to store and retrieve employee information.</p>
+     <div style="margin-top: 2rem; text-align: center;">
+         <a href="${pageContext.request.contextPath}/login.jsp" class="btn-main" style="display: inline-block; text-decoration: none;">Access the Application</a>
+     </div>
      </section>
-     <section>
+     <%-- <section>
     <table>
     	<caption>Employee List</caption>
     	<thead>
         <tr>
-            <th scope="col">ID</th>
+            <th scope="col">ID</th> --%>
             <th scope="col">First Name</th>
             <th scope="col">Last Name</th>
             <th scope="col">DOB</th>
