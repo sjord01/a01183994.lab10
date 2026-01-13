@@ -9,4 +9,6 @@
 /home/runner/work/a01183994.lab10/a01183994.lab10/src/main/java/a01183994/lab10/database/util/DbUtil.java
 /home/runner/work/a01183994.lab10/a01183994.lab10/src/main/java/a01183994/lab10/database/util/ErrorCode.java
 /home/runner/work/a01183994.lab10/a01183994.lab10/src/main/java/a01183994/lab10/database/util/Validator.java
+/home/runner/work/a01183994.lab10/a01183994.lab10/src/main/java/a01183994/lab10/servlet/AdminQueryServlet.java
 /home/runner/work/a01183994.lab10/a01183994.lab10/src/main/java/a01183994/lab10/servlet/EmployeeServlet.java
+/home/runner/work/a01183994.lab10/a01183994.lab10/src/main/java/a01183994/lab10/servlet/LogoutServlet.java
