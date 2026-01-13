@@ -46,7 +46,7 @@
             <h1>Login</h1>
             <p>Please enter your credentials to access the application.</p>
             
-            <form class="login-form" method="POST" action="${pageContext.request.contextPath}/j_security_check">
+            <form class="login-form" method="POST" action="j_security_check">
                 <div class="form-group">
                     <label for="j_username">Username:</label>
                     <input type="text" id="j_username" name="j_username" required>
