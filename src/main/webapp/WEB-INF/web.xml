@@ -37,7 +37,7 @@
 	        <url-pattern>/addEmployees.jsp</url-pattern>
 	        <url-pattern>/deleteEmployee.jsp</url-pattern>
 	        <url-pattern>/findEmployees.jsp</url-pattern>
-	        <url-pattern>/a01183994.lab10.servlet.EmployeeServlet</url-pattern>
+	        <url-pattern>/</url-pattern>
 	    </web-resource-collection>
 	    <auth-constraint>
 	        <role-name>admin</role-name>
