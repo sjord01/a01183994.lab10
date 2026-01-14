@@ -1,14 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c' %>
 
-<section class="add-employee-form">
+<section id="add-employee-form">
     <h2>Add New Employee</h2>
-    
-    <c:if test="${not empty resultCode}">
-        <div class="message ${resultCode == 200 ? 'success' : 'error'}">
-            Code: ${resultCode} - ${resultDescription}
-        </div>
-    </c:if>
     
     <form action="${pageContext.request.contextPath}" method="post">
         <div class="form-group">
@@ -31,6 +25,12 @@
             <input type="date" id="dob" name="dob" required>
         </div>
         
-        <button type="submit">Add Employee</button>
+        <button class="btn-form" type="submit">Add Employee</button>
     </form>
+    
+     <c:if test="${not empty resultCode}">
+        <div class="message ${resultCode == 200 ? 'success' : 'error'}">
+            Code: ${resultCode} - ${resultDescription}
+        </div>
+    </c:if>
 </section>

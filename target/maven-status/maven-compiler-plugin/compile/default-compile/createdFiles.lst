@@ -9,4 +9,6 @@ a01183994/lab10/database/util/ErrorCode.class
 a01183994/lab10/database/Database.class
 a01183994/lab10/database/util/ApplicationException.class
 a01183994/lab10/database/dao/Dao.class
+a01183994/lab10/servlet/LogoutServlet.class
 a01183994/lab10/servlet/EmployeeServlet.class
+a01183994/lab10/servlet/AdminQueryServlet.class
