@@ -1,0 +1,10 @@
+target/
+.DS_Store
+.classpath
+.project
+.settings/
+*.class
+*.jar
+*.war
+*.ear
+${env.JBOSS_HOME}/

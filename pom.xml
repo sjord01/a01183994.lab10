@@ -84,12 +84,10 @@
     <artifactId>maven-war-plugin</artifactId>
     <version>3.3.2</version>
     <configuration>
-        <!-- Copying the created war file into the Deployment folder of WildFly -->
-        <outputDirectory>${env.JBOSS_HOME}/standalone/deployments</outputDirectory>
         <!-- Include Java source files in the WAR -->
         <webResources>
             <resource>
-                <directory>${build.sourceDirectory}</directory>
+                <directory>${project.build.sourceDirectory}</directory>
                 <targetPath>WEB-INF/classes</targetPath>
             </resource>
         </webResources>
