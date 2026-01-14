@@ -103,6 +103,26 @@ public class EmployeeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
+        // Role-based redirection for initial access after login
+        // Check if this is the first access (no specific action parameters)
+        String searchId = req.getParameter("searchId");
+        String action = req.getParameter("action");
+        Boolean hasRedirected = (Boolean) req.getSession().getAttribute("hasRedirected");
+        
+        // Only redirect on first access (after login, before any employee operations)
+        if (searchId == null && action == null && hasRedirected == null) {
+            req.getSession().setAttribute("hasRedirected", true);
+            String contextPath = req.getContextPath();
+            
+            if (req.isUserInRole("admin")) {
+                resp.sendRedirect(contextPath + "/admin.jsp");
+                return;
+            } else if (req.isUserInRole("user")) {
+                resp.sendRedirect(contextPath + "/user.jsp");
+                return;
+            }
+        }
+        
     	//FOR DELETING AN EMPLOYEE INSTANCE
     	Object deleteResultCode = req.getSession().getAttribute("deleteResultCode");
         if (deleteResultCode != null) {
@@ -122,7 +142,7 @@ public class EmployeeServlet extends HttpServlet {
     	try {
             if (employeeController != null) {
                 // Handle find employee request if searchId parameter exists
-                String searchId = req.getParameter("searchId");
+                // searchId already declared at the beginning of doGet method
                 if (searchId != null && !searchId.trim().isEmpty()) {
                     try {
                         Employee employee = employeeController.findEmployee(searchId.toUpperCase());
